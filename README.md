@@ -45,6 +45,81 @@ Vamos então deixar o nosso projeto mais robusto e adicionar uma nova funcionali
 
 ### Minha Resolução:
 
+-   Adicionei um campo para receber a digitação do usuário e outro para limpar a pesquisa:
+    ```
+    <div>
+        <input
+            value={namePlaylist}
+            onChange={(e) => setNamePlaylist(e.target.value)}
+            placeholder="Nome da Playlist"
+        />
+        <button
+            type="submit"
+            onClick={() => {
+    enviarDados();
+            }}
+        >
+            Pesquisar
+        </button>
+        <button
+            onClick={() => {
+    resete();
+            }}
+        >
+            Limpar
+        </button>
+    </div>
+    ```
+-   Criei mais dois estados, um para receber os valores digitados pelo usuário e outro para passar os valores da pesquisa a cada nova pesquisa e para ser monitorado pelo `useEffect`:
+
+    ```
+    const [namePlaylist, setNamePlaylist] = useState('');
+    const [pesquisa, setPesquisa] = useState({ nome: '' });
+    ```
+
+-   Criei a função de requisição:
+    ```
+    const pesquisaPlaylist = async (pesquisa) => {
+        try {
+            const resp = await axios.get(
+                `https://us-central1-labenu-apis.cloudfunctions.net/labefy/playlists/search?name=${pesquisa.nome}`,
+                {
+                    headers: {
+                        Authorization: 'amanda-polari-easley',
+                    },
+                }
+            );
+            resp.data.result.playlist.length
+                ? setPlaylists(resp.data.result.playlist)
+                : getAllPlaylists();
+        } catch (error) {
+            console.log(error.response);
+        }
+    };
+    ```
+-   Essas são as funções de `enviarDados` chamada no clique de _pesquisar_ e `resete` chamada no clique de _limpar_
+
+    ```
+    const enviarDados = () => {
+        const novaPesquisa = {
+            nome: namePlaylist,
+        };
+        setPesquisa(novaPesquisa);
+        setNamePlaylist('');
+    };
+
+    const resete = () => {
+        getAllPlaylists();
+    };
+    ```
+
+-   Por fim criei um useEffect para monitorar as mudanças do estado `pesquisa`
+    ```
+    useEffect(() => {
+        pesquisaPlaylist(pesquisa);
+    }, [pesquisa]);
+    ```
+
 # Exercício 4
 
 ### Enunciado:
@@ -52,3 +127,43 @@ Vamos então deixar o nosso projeto mais robusto e adicionar uma nova funcionali
 Por fim, vamos agora adicionar a funcionalidade de deletar uma playlist. Caso você tenha alguma dificuldade nas requisições, pode conferir como foi utilizado no exercício passado.
 
 ### Minha Resolução:
+
+-   Adicionei o botão de deletar playlist:
+
+    ```
+    <button
+        onClick={() => {
+            deletarPlaylist(props.playlist.id);
+        }}
+    >
+        X
+    </button>
+    ```
+
+-   Passei a função `getAllPlaylist` por props, para poder renderizar as playlists restantes após a removação da playlist desejada:
+
+    ```
+    <Musicas key={playlist.id} playlist={playlist} getAllPlaylists={getAllPlaylists} />;
+    ```
+
+-   Criei a função de fazer a deleção da playlist da seguinte forma:
+    ```
+    const deletarPlaylist = (PlaylistId) => {
+        axios
+            .delete(
+                `https://us-central1-labenu-apis.cloudfunctions.net/labefy/playlists/${PlaylistId}`,
+                {
+                    headers: {
+                        Authorization: 'amanda-polari-easley',
+                    },
+                }
+            )
+            .then(() => {
+                alert('playlist removida');
+                props.getAllPlaylists();
+            })
+            .catch((err) => {
+                console.log(err.response);
+            });
+    };
+    ```
