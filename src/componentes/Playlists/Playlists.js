@@ -94,7 +94,7 @@ function Playlists() {
                 </button>
             </div>
             {playlists.map((playlist) => {
-                return <Musicas key={playlist.id} playlist={playlist} />;
+                return <Musicas key={playlist.id} playlist={playlist} getAllPlaylists={getAllPlaylists} />;
             })}
         </div>
     );

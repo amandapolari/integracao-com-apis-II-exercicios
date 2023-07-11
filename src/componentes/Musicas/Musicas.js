@@ -91,9 +91,35 @@ export default function Musicas(props) {
             });
     };
 
+    const deletarPlaylist = (PlaylistId) => {
+        axios
+            .delete(
+                `https://us-central1-labenu-apis.cloudfunctions.net/labefy/playlists/${PlaylistId}`,
+                {
+                    headers: {
+                        Authorization: 'amanda-polari-easley',
+                    },
+                }
+            )
+            .then(() => {
+                alert('playlist removida');
+                props.getAllPlaylists();
+            })
+            .catch((err) => {
+                console.log(err.response);
+            });
+    };
+
     return (
         <ContainerMusicas>
             <h2>{props.playlist.name}</h2>
+            <button
+                onClick={() => {
+                    deletarPlaylist(props.playlist.id);
+                }}
+            >
+                X
+            </button>
             {musicas.map((musica) => {
                 return (
                     <Musica key={musica.id}>

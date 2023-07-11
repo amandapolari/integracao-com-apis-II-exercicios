@@ -127,3 +127,43 @@ Vamos então deixar o nosso projeto mais robusto e adicionar uma nova funcionali
 Por fim, vamos agora adicionar a funcionalidade de deletar uma playlist. Caso você tenha alguma dificuldade nas requisições, pode conferir como foi utilizado no exercício passado.
 
 ### Minha Resolução:
+
+-   Adicionei o botão de deletar playlist:
+
+    ```
+    <button
+        onClick={() => {
+            deletarPlaylist(props.playlist.id);
+        }}
+    >
+        X
+    </button>
+    ```
+
+-   Passei a função `getAllPlaylist` por props, para poder renderizar as playlists restantes após a removação da playlist desejada:
+
+    ```
+    <Musicas key={playlist.id} playlist={playlist} getAllPlaylists={getAllPlaylists} />;
+    ```
+
+-   Criei a função de fazer a deleção da playlist da seguinte forma:
+    ```
+    const deletarPlaylist = (PlaylistId) => {
+        axios
+            .delete(
+                `https://us-central1-labenu-apis.cloudfunctions.net/labefy/playlists/${PlaylistId}`,
+                {
+                    headers: {
+                        Authorization: 'amanda-polari-easley',
+                    },
+                }
+            )
+            .then(() => {
+                alert('playlist removida');
+                props.getAllPlaylists();
+            })
+            .catch((err) => {
+                console.log(err.response);
+            });
+    };
+    ```
